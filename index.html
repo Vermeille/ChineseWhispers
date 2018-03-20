@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+    <head>
+<style>
+canvas {
+    border-style: solid;
+}
+</style>
+    </head>
+    <body>
+        <h1>Chinese Whispers</h1>
+        Chinese Whispers is a graph clustering algorithm. In order to make a
+        graph easily, place some nodes by clicking in the area below. Each node
+        is connected to the other nodes that are close enough. How far "close
+        enough" is is defined by the slider below. Then, each cluster will be
+        labeled with a different color.
+        <div>
+            Radius: <input type="range" min="1" max="500" id="maxdist" />
+            <span id="showrange"></span>
+        </div>
+        <div style="display: flex">
+            <canvas id='canvas' height="800" width="800">
+            </canvas>
+            <div id="clusterlist"></div>
+        </div>
+    </body>
+    <script src="index.js"></script>
+    <script>
+function d(u, v) {
+    let x = u[0] - v[0];
+    let y = u[1] - v[1];
+    return Math.sqrt(x * x + y * y);
+}
+
+let data = [];
+let links = [];
+let clusters = [];
+let maxDist = 50;
+let canvas = document.getElementById('canvas');
+let $text = document.getElementById('showrange');
+let $clusterlist = document.getElementById('clusterlist');
+document.getElementById('maxdist').addEventListener('input', e => {
+    maxDist = e.target.value;
+    $text.innerText = maxDist;
+    update();
+    draw();
+});
+
+canvas.addEventListener('click', e => {
+    let x = e.pageX - canvas.offsetLeft;
+    let y = e.pageY - canvas.offsetTop;
+    data.push([x, y]);
+    update();
+    draw();
+});
+
+function update() {
+    links = data.map((x, i) =>
+        range(0, data.length).filter(j => i !== j && d(x, data[j]) < maxDist),
+    );
+
+    let cw = new ChineseWhispers(links);
+    cw.start();
+    while (!cw.ended()) {
+        cw.step();
+    }
+    clusters = cw.getRes();
+    console.log(clusters);
+}
+
+function buildColorDict(clusters) {
+    let clusterColor = {};
+    let clustersCount = count(clusters);
+    let i = 0;
+    for (let c of clustersCount) {
+        clusterColor[c[0]] = Math.floor(304 / clustersCount.length * i);
+        ++i;
+    }
+    return clusterColor;
+}
+
+function draw() {
+    let ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#000';
+    let clusterColor = buildColorDict(clusters);
+    console.log(clusterColor);
+    ctx.beginPath();
+    links.forEach((neighbors, lFrom) => {
+        neighbors.forEach(lTo => {
+            ctx.moveTo(data[lFrom][0], data[lFrom][1]);
+            ctx.lineTo(data[lTo][0], data[lTo][1]);
+        });
+    });
+    ctx.stroke();
+
+    data.forEach((coord, i) => {
+        ctx.fillStyle = `hsl(${clusterColor[clusters[i]]}, 100%, 50%)`;
+        ctx.fillRect(coord[0] - 2, coord[1] - 2, 5, 5);
+    });
+
+    $clusterlist.innerHTML =
+        `<ul>
+            ${Object.values(clusterColor).map((c, i) =>
+                `<li style="color:hsl(${c}, 100%, 50%)">Cluster ${i}</li>`
+            ).join('')}
+        </ul>`;
+}
+    </script>
+</html>

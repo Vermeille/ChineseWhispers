@@ -1,0 +1,19 @@
+{
+  "name": "chinesewhispers",
+  "version": "1.0.0",
+  "description": "This is a browser implementation of the chinese whispers graph clustering algorithm.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Vermeille/ChineseWhispers.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Vermeille/ChineseWhispers/issues"
+  },
+  "homepage": "https://github.com/Vermeille/ChineseWhispers#readme"
+}
