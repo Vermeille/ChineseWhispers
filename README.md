@@ -1,5 +1,7 @@
 # The Whisperer in Chinese
 
+[Demo!](https://vermeille.github.io/ChineseWhispers/)
+
 This is a browser implementation of the chinese whispers graph clustering
 algorithm.
 
